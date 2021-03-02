@@ -12,7 +12,7 @@ import {
   HashRouter,
   NavLink
 } from "react-router-dom";
-import Navbar from './Navbar/Navbar';
+import Navbars from './Navbar/Navbar';
 import Admin from './Admin/Admin';
 import Dashboard from './Dashboard/Dashboard';
 import Contracts from './Contracts/Contracts';
@@ -53,7 +53,7 @@ export default class SpFxNavigation extends React.Component<ISpFxNavigationProps
       <HashRouter>
         <Stack styles={stackStyles}>
           <StackItem align="auto" styles={stackheaderStyles}>
-            <Navbar {...this.props}/>
+            <Navbars {...this.props}/>
           </StackItem>
           <StackItem align="auto" styles={stackfooterStyles}>
           <Switch>

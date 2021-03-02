@@ -20,6 +20,19 @@ import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
+import { useId, useBoolean } from '@uifabric/react-hooks';
+import {
+  getTheme,
+  mergeStyleSets,
+  FontWeights,
+  ContextualMenu,
+  Toggle,
+  Modal,
+  IDragOptions,
+  IconButton,
+} from 'office-ui-fabric-react';
+
+
 
 const stackStyles: IStackStyles = {
   root: {
@@ -46,6 +59,9 @@ export interface ISPList {
   Title: string;
   NewTitle: string;
   order: string;
+  IsDefault: string;
+  canDelete: string;
+  toLink: string;
 }
 
 export interface ISPLists {
@@ -140,7 +156,6 @@ export default class CustomNavigation extends React.Component<
   }
 
   private _renderListAsync(): void {
-    console.log("_renderListAsync");
     this._getListData().then((response) => {
       this._renderList(response.value);
     });
@@ -156,10 +171,15 @@ export default class CustomNavigation extends React.Component<
     console.log("handelEdit", id);
   }
 
+
   private async deleteMenu(id: any): Promise<void> {
-    console.log("deleteMenu", id);
+    var option = window.confirm(`Are you sure want to Delete`);
+    if(option){
     let list = sp.web.lists.getByTitle("DynamicMenu");
-    await list.items.getById(id).delete();
+    await list.items.getById(id).delete().then(res => {
+      window.location.reload(false);
+    });
+    }
   }
 
   public render(): React.ReactElement<ISpFxNavigationProps> {
