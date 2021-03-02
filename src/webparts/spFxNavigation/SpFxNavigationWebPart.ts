@@ -11,6 +11,8 @@ import * as strings from 'SpFxNavigationWebPartStrings';
 import SpFxNavigation from './components/SpFxNavigation';
 import { ISpFxNavigationProps } from './components/ISpFxNavigationProps';
 import { SPComponentLoader } from '@microsoft/sp-loader';
+import { sp } from "@pnp/sp";
+import "@pnp/sp/webs";
 
 export interface ISpFxNavigationWebPartProps {
   description: string;
@@ -23,6 +25,9 @@ export interface ISpFxNavigationWebPartProps {
 export default class SpFxNavigationWebPart extends BaseClientSideWebPart<ISpFxNavigationWebPartProps> {
   protected onInit(): Promise<void> {
     SPComponentLoader.loadCss("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+    sp.setup({
+      spfxContext: this.context
+    });
     return super.onInit();
   }
   public render(): void {
