@@ -5,7 +5,7 @@ import {
   IPropertyPaneConfiguration,
   PropertyPaneTextField
 } from '@microsoft/sp-property-pane';
-import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
+import { BaseClientSideWebPart, WebPartContext } from '@microsoft/sp-webpart-base';
 
 import * as strings from 'SpFxNavigationWebPartStrings';
 import SpFxNavigation from './components/SpFxNavigation';
@@ -13,6 +13,10 @@ import { ISpFxNavigationProps } from './components/ISpFxNavigationProps';
 
 export interface ISpFxNavigationWebPartProps {
   description: string;
+  context: WebPartContext;
+  spHttpClient: any;
+  siteUrl: string;
+  listName: string;
 }
 
 export default class SpFxNavigationWebPart extends BaseClientSideWebPart<ISpFxNavigationWebPartProps> {
@@ -21,7 +25,11 @@ export default class SpFxNavigationWebPart extends BaseClientSideWebPart<ISpFxNa
     const element: React.ReactElement<ISpFxNavigationProps> = React.createElement(
       SpFxNavigation,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        context: this.context,
+        spHttpClient: this.context.spHttpClient,
+        siteUrl: this.context.pageContext.web.absoluteUrl,
+        listName: '',
       }
     );
 

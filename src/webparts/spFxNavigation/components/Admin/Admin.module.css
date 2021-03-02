@@ -1,0 +1,23 @@
+.admin_active_class {
+    color: tomato;
+    border-bottom: 1px solid black;
+    /* border-bottom: 1px solid red; */
+}
+
+.admin_nav_deco:hover {
+  color: tomato !important;
+}
+
+.admin_nav_deco {
+    /* color: black !important; */
+    padding: 5px !important;
+    font-weight:400 !important;
+    text-decoration: none !important;
+}
+
+.button_deco {
+    /* font-weight:200;
+    border: 1px solid rgb(187, 187, 187) ;
+    text-align: right;
+    display: inline-block; */
+}

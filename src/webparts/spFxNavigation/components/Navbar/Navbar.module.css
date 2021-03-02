@@ -1,0 +1,38 @@
+.active_class {
+    color: tomato;
+    border-bottom: 1px solid red;
+    /* border-bottom: 1px solid red; */
+}
+
+.nav_deco:hover {
+  color: tomato !important;
+}
+.nav_deco {
+    /* color: black; */
+    padding: 5px !important;
+    font-weight:500 !important;
+    text-decoration: none !important;
+}
+
+
+/* Desktop View  */
+@media (min-width: 1024px)
+{
+    img {
+        background-color: lightcoral;
+    }
+}
+
+/* Tablet View  */
+@media (min-width: 700px) and (max-width: 1023px) {
+    img {
+        background-color: blueviolet;
+    }
+}
+
+/* Mobile View */
+@media (max-width: 700px) {
+    img {
+        background-color: seagreen;
+    }
+}
