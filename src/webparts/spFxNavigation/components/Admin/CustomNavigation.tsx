@@ -21,6 +21,8 @@ import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
 import { EditMenuModal } from "./EditMenuModal";
+import * as ReactModal from "react-modal";
+
 const stackStyles: IStackStyles = {
   root: {
     background: DefaultPalette.white,
@@ -54,7 +56,7 @@ export interface ISPList {
 export interface ISPLists {
   value: ISPList[];
 }
-
+let subtitle;
 export default class CustomNavigation extends React.Component<
   ISpFxNavigationProps,
   any
@@ -65,9 +67,15 @@ export default class CustomNavigation extends React.Component<
       Listvalue: [],
       InputID: 1,
       styleDisplay: "none",
-      input: '',
+      input: "",
+      open: false,
+      previnput: "",
+      showModal: false,
+      setIsOpen: true,
     };
     this._renderListAsync();
+    this.handleOpenModal = this.handleOpenModal.bind(this);
+    this.handleCloseModal = this.handleCloseModal.bind(this);
   }
 
   //   public componentDidMount() {
@@ -105,7 +113,7 @@ export default class CustomNavigation extends React.Component<
       );
   }
 
- private _getListData(): Promise<ISPLists> {
+  private _getListData(): Promise<ISPLists> {
     return this.props.spHttpClient
       .get(
         this.props.siteUrl +
@@ -150,10 +158,53 @@ export default class CustomNavigation extends React.Component<
   private async updateMenu(id, title): Promise<void> {
     // console.log("index, title",id, title);
     let list = sp.web.lists.getByTitle("DynamicMenu");
-    const i = await list.items.getById(id).update({
-      Value: title,
-    });
+    const i = await list.items
+      .getById(id)
+      .update({
+        Value: title,
+      })
+      .then(() => {
+        this.setState({
+          input: "",
+          styleDisplay: "none",
+        });
+        this.componentDidUpdate(this.state);
+      });
+      this.handleCloseModal();
     return Promise.resolve();
+  }
+
+  private async handleOpenModal(id) {
+    // console.log('id',id);
+    this.setState({
+      InputID: +id,
+      styleDisplay: "block",
+      showModal: true,
+    });
+
+    const item = await sp.web.lists
+      .getByTitle("DynamicMenu")
+      .items.getById(id)
+      .select("Value")
+      .get();
+    // console.log("item",item.Value);
+    this.setState({
+      input: item.Value,
+    });
+  }
+
+  private handleCloseModal() {
+    this.setState({ showModal: false });
+  }
+
+  public componentDidUpdate(_state) {
+    // Typical usage (don't forget to compare props):
+    if (this.state.input !== this.state.previnput) {
+      this._renderListAsync();
+      this.setState({
+        previnput: this.state.input,
+      });
+    }
   }
 
   private handleEdit = async (id: any) => {
@@ -162,7 +213,11 @@ export default class CustomNavigation extends React.Component<
       InputID: +id,
       styleDisplay: "block",
     });
-    const item = await sp.web.lists.getByTitle("DynamicMenu").items.getById(id).select("Value").get(); 
+    const item = await sp.web.lists
+      .getByTitle("DynamicMenu")
+      .items.getById(id)
+      .select("Value")
+      .get();
     // console.log("item",item.Value);
     this.setState({
       input: item.Value,
@@ -174,6 +229,28 @@ export default class CustomNavigation extends React.Component<
       input: e.target.value,
     });
   }
+
+  private afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    subtitle.style.color = '#f00';
+  }
+ 
+  private closeModal(){
+    this.setState({
+      setIsOpen: false,
+    });
+  }
+
+  private customStyles = {
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
 
   public render(): React.ReactElement<ISpFxNavigationProps> {
     return (
@@ -187,11 +264,11 @@ export default class CustomNavigation extends React.Component<
               <div>
                 {this.state.Listvalue.map((val: ISPList) => {
                   return (
-                    <p>
+                    <>
                       <span> {val.Value}</span>{" "}
                       <button
                         style={{ border: "none" }}
-                        onClick={() => this.handleEdit(val.Id)}
+                        onClick={() => this.handleOpenModal(val.Id)}
                       >
                         Edit
                       </button>
@@ -200,11 +277,48 @@ export default class CustomNavigation extends React.Component<
                         onClick={() => this.deleteMenu(val.Id)}
                       >
                         Delete
-                      </button>
-                    </p>
+                      </button>{" "}
+                      <br />
+                    </>
                   );
                 })}
-                <div
+
+                <div>
+                  <ReactModal
+                    isOpen={this.state.showModal}
+                    contentLabel="Edit Modal"
+                    style={this.customStyles}
+                    // onAfterOpen={this.afterOpenModal}
+                    // onRequestClose={this.closeModal}
+                  >
+                    <div>
+                      <label htmlFor="Menu">Add Title</label>{' '}
+                      <input
+                        type="text"
+                        id="Menu"
+                        value={this.state.input}
+                        onChange={(e) => this.setInput(e)}
+                      />{" "}
+                      {/* <label htmlFor="url">URL</label>
+                      <input
+                        type="text"
+                        id="url"
+                        value={this.state.input}
+                        disabled
+                      />{" "} */}
+                      <button onClick={this.handleCloseModal}>CANCEL</button>
+                      <button
+                        onClick={() =>
+                          this.updateMenu(this.state.InputID, this.state.input)
+                        }
+                      >
+                        SAVE
+                      </button>{" "}
+                    </div>
+                  </ReactModal>
+                </div>
+
+                {/* <div
                   className="modal-edit"
                   style={{ display: this.state.styleDisplay }}
                 >
@@ -212,11 +326,17 @@ export default class CustomNavigation extends React.Component<
                     type="text"
                     value={this.state.input}
                     onChange={(e) => this.setInput(e)}
-                  />{' '}
-                  <button onClick={() => this.updateMenu(this.state.InputID, this.state.input)}>
-                    Submit
-                  </button>
-                </div>
+                  />{" "}
+                  <button
+                    onClick={() =>
+                      this.updateMenu(this.state.InputID, this.state.input)
+                    }
+                  >
+                    SAVE
+                  </button>{" "}
+                  <br />
+                </div> */}
+
               </div>
             </div>
           </StackItem>
