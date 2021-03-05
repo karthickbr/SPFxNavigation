@@ -21,3 +21,7 @@
     text-align: right;
     display: inline-block; */
 }
+
+#spSiteHeader {
+    display: none !important;
+  }

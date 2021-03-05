@@ -1,6 +1,6 @@
 import * as React from "react";
 import { DefaultPalette } from "office-ui-fabric-react/lib/Styling";
-import  "../Navbar/Navbar.module.css";
+import "../Navbar/Navbar.module.css";
 import { IImageProps, ImageFit } from "office-ui-fabric-react/lib/Image";
 import {
   Stack,
@@ -18,7 +18,6 @@ import {
 } from "@microsoft/sp-http";
 import { Environment, EnvironmentType } from "@microsoft/sp-core-library";
 import { Nav, INavLinkGroup } from "office-ui-fabric-react/lib/Nav";
-
 
 export interface ISPList {
   Id: string;
@@ -156,65 +155,61 @@ export default class Navbar extends React.Component<ISpFxNavigationProps, any> {
   }
 
   public render(): React.ReactElement<ISpFxNavigationProps> {
-    return <div>
-
-<nav className="container navbar_default">
-            <div style={{borderRight:"1px solid #d2d2d2"}}>
-                <img className="logo_style" src="https://www.convergepoint.com/wp-content/uploads/2016/12/logo.png" />
-            </div>
-            <div>
-                <ul className="navbar_menu">
-
-                {this.state.Listvalue.slice(0, 5).map((val: ISPList) => {
+    return (
+      <div>
+        <nav className="container navbar_default">
+          <div style={{ borderRight: "1px solid #d2d2d2" }}>
+            <img
+              className="logo_style"
+              src="https://www.convergepoint.com/wp-content/uploads/2016/12/logo.png"
+            />
+          </div>
+          <div>
+            <ul className="navbar_menu">
+              {this.state.Listvalue.slice(0, 5).map((val: ISPList) => {
                 return (
                   <li>
-                      <NavLink
-                        exact
-                        activeClassName="active_class"
-                        
-                        to={val.toLink}
-                      >
-                        {val.Value}
-                      </NavLink>
-                      </li>  
+                    <NavLink
+                      exact
+                      activeClassName="active_class"
+                      to={val.toLink}
+                    >
+                      {val.Value}
+                    </NavLink>
+                  </li>
                 );
               })}
-                  
-                    <li style={{position:"relative"}}>
-                    <div className="dropdown">
 
-                    <NavLink className="dropbtn" to="/">
-                      OTHER LINKS
-                      <i className="fa fa-caret-down"></i>
-                    </NavLink>
-                    <div className="dropdown-content">
-                      {this.state.Listvalue.slice(5, this.state.length).map(
-                        (val: ISPList) => {
-                          return (
-                            <div>
-                              {/* <Link href={val.extLink} target="_blank" data-interception="off">{val.Value}</Link> */}
-                              <a
-                                href={val.extLink["Url"]}
-                                target="_blank"
-                                data-interception="off"
-                              >
-                                {val.extLink["Description"]}
-                              </a>
-                            </div>
-                          );
-                        }
-                      )}
-                    </div>
+              <li style={{ position: "relative" }}>
+                <div className="dropdown">
+                  <NavLink className="dropbtn" to="/">
+                    OTHER LINKS
+                    <i className="fa fa-caret-down"></i>
+                  </NavLink>
+                  <div className="dropdown-content">
+                    {this.state.Listvalue.slice(5, this.state.length).map(
+                      (val: ISPList) => {
+                        return (
+                          <div>
+                            {/* <Link href={val.extLink} target="_blank" data-interception="off">{val.Value}</Link> */}
+                            <a
+                              href={val.extLink["Url"]}
+                              target="_blank"
+                              data-interception="off"
+                            >
+                              {val.extLink["Description"]}
+                            </a>
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
-              
-                  
-                    </li>
-                </ul>
-            </div>
+                </div>
+              </li>
+            </ul>
+          </div>
         </nav>
-
-
-
-    </div>;
+      </div>
+    );
   }
 }

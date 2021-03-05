@@ -28,7 +28,8 @@
 .navbar_menu li a {
     color:#5B6370;
     display: block;
-    padding: .5rem 0.8rem;
+    /* padding: .5rem 0.8rem; */
+    padding: .5rem 4rem;
     text-decoration: none;
 }
  
@@ -103,4 +104,8 @@
 
 .nav_deco:hover {
   color: tomato !important;
+}
+
+#spSiteHeader {
+  display: none !important;
 }
