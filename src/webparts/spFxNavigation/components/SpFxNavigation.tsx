@@ -21,6 +21,7 @@ import Reports from './Reports/Reports';
 import Request from './Request/Request';
 import AdvanceOptions from './Admin/AdvanceOptions';
 import CustomNavigation from './Admin/CustomNavigation';
+import ErrorPage from './ErrorPage/ErrorPage';
 
 
 
@@ -34,7 +35,7 @@ const stackStyles: IStackStyles = {
 const stackheaderStyles: IStackStyles = {
   root: {
     background: DefaultPalette.white,
-    height: 50,
+    // height: 50,
     boxShadow: "0 10px 2px 0 rgba(0, 0, 0, 0.19)",
   },
 };
@@ -67,7 +68,8 @@ export default class SpFxNavigation extends React.Component<ISpFxNavigationProps
             <Route exact path="/AdvancedOptions" component={AdvanceOptions}/>
             {/* <Route exact path="/CustomNavigation" component={CustomNavigation }/> */}
             <Route exact path="/CustomNavigation" render={() => <CustomNavigation {...this.props} />}/>
-            <Route path="/siteSettings" />
+            {/* <Route path="/siteSettings" /> */}
+            <Route component={ErrorPage} />
         </Switch>
           </StackItem>
         </Stack>

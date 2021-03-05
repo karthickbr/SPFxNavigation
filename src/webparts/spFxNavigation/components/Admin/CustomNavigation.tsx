@@ -20,8 +20,8 @@ import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists";
 import "@pnp/sp/items";
-import { EditMenuModal } from "./EditMenuModal";
 import * as ReactModal from "react-modal";
+import { IItemAddResult } from "@pnp/sp/items";
 
 const stackStyles: IStackStyles = {
   root: {
@@ -51,6 +51,7 @@ export interface ISPList {
   IsDefault: string;
   canDelete: string;
   toLink: string;
+  extLink: object;
 }
 
 export interface ISPLists {
@@ -72,6 +73,14 @@ export default class CustomNavigation extends React.Component<
       previnput: "",
       showModal: false,
       setIsOpen: true,
+      showAddModal: false,
+      Title: "",
+      Value: "",
+      Order: 0,
+      IsDefault: "",
+      CanDelete: "",
+      ToLink: "",
+      extLink: "",
     };
     this._renderListAsync();
     this.handleOpenModal = this.handleOpenModal.bind(this);
@@ -117,7 +126,7 @@ export default class CustomNavigation extends React.Component<
     return this.props.spHttpClient
       .get(
         this.props.siteUrl +
-          `/_api/web/lists/GetByTitle('DynamicMenu')/Items?select=Id,Title,Value,order`,
+          `/_api/web/lists/GetByTitle('DynamicMenu')/Items?select=Id,Title,Value,order0,extLink`,
         SPHttpClient.configurations.v1
       )
       .then((response: SPHttpClientResponse) => {
@@ -169,8 +178,11 @@ export default class CustomNavigation extends React.Component<
           styleDisplay: "none",
         });
         this.componentDidUpdate(this.state);
+      })
+      .then((res) => {
+        window.location.reload(false);
       });
-      this.handleCloseModal();
+    this.handleCloseModal();
     return Promise.resolve();
   }
 
@@ -193,8 +205,45 @@ export default class CustomNavigation extends React.Component<
     });
   }
 
+  private async handleOpenAddModal() {
+    this.setState({
+      showAddModal: true,
+    });
+  }
+
+  private async addNewMenu() {
+    //  const iar: IItemAddResult = await sp.web.lists
+    return await sp.web.lists
+      .getByTitle("DynamicMenu")
+      .items.add({
+        Title: this.state.Title,
+        Value: this.state.Value,
+        order0: 0,
+        IsDefault: "False",
+        canDelete: "True",
+        toLink: this.state.ToLink,
+        extLink: { Url: this.state.extLink, Description: this.state.extLink },
+      })
+      .then((res) => {
+        this.setState({
+          Title: "",
+          Value: "",
+          order0: "",
+          IsDefault: "",
+          canDelete: "",
+          ToLink: "",
+          showAddModal: false,
+          extLink: "",
+        });
+      });
+    // console.log(iar);
+  }
+
   private handleCloseModal() {
     this.setState({ showModal: false });
+    this.setState({
+      showAddModal: false,
+    });
   }
 
   public componentDidUpdate(_state) {
@@ -230,12 +279,36 @@ export default class CustomNavigation extends React.Component<
     });
   }
 
+  private setTitle(e: any) {
+    this.setState({
+      Title: e,
+    });
+  }
+
+  private setValue(e: any) {
+    this.setState({
+      Value: e.target.value,
+    });
+  }
+
+  private setOrder(e: any) {
+    this.setState({
+      Order: e.target.value,
+    });
+  }
+
+  private setExtLink(e: any) {
+    this.setState({
+      extLink: e.target.value,
+    });
+  }
+
   private afterOpenModal() {
     // references are now sync'd and can be accessed.
-    subtitle.style.color = '#f00';
+    subtitle.style.color = "#f00";
   }
- 
-  private closeModal(){
+
+  private closeModal() {
     this.setState({
       setIsOpen: false,
     });
@@ -261,6 +334,15 @@ export default class CustomNavigation extends React.Component<
         <Stack styles={stackStyles}>
           <StackItem align="auto" styles={stackheaderStyles}>
             <div>
+              <StackItem align="auto" styles={stackheaderStyles}>
+                <button
+                  style={{ border: "none" }}
+                  onClick={() => this.handleOpenAddModal()}
+                >
+                  ADD NEW
+                </button>
+              </StackItem>
+
               <div>
                 {this.state.Listvalue.map((val: ISPList) => {
                   return (
@@ -288,11 +370,12 @@ export default class CustomNavigation extends React.Component<
                     isOpen={this.state.showModal}
                     contentLabel="Edit Modal"
                     style={this.customStyles}
+                    ariaHideApp={false}
                     // onAfterOpen={this.afterOpenModal}
                     // onRequestClose={this.closeModal}
                   >
                     <div>
-                      <label htmlFor="Menu">Add Title</label>{' '}
+                      <label htmlFor="Menu">Add Title</label>{" "}
                       <input
                         type="text"
                         id="Menu"
@@ -312,8 +395,64 @@ export default class CustomNavigation extends React.Component<
                           this.updateMenu(this.state.InputID, this.state.input)
                         }
                       >
-                        SAVE
+                        UPDATE
                       </button>{" "}
+                    </div>
+                  </ReactModal>
+                </div>
+
+                <div>
+                  <ReactModal
+                    isOpen={this.state.showAddModal}
+                    contentLabel="Add Menu Modal"
+                    style={this.customStyles}
+                    ariaHideApp={false}
+                  >
+                    <div>
+                      <label htmlFor="Menu">Add Title</label>{" "}
+                      <input
+                        type="text"
+                        id="Menu"
+                        value={this.state.Title}
+                        onChange={(e) => this.setTitle(e.target.value)}
+                      />{" "}
+                      <label htmlFor="Dname">Display Name</label>
+                      <input
+                        type="text"
+                        id="Dname"
+                        value={this.state.Value}
+                        onChange={(e) => this.setValue(e)}
+                      />{" "}
+                      <label htmlFor="order">Order</label>
+                      <input
+                        type="Number"
+                        id="order"
+                        value={this.state.Order}
+                        onChange={(e) => this.setOrder(e)}
+                      />{" "}
+                      {/* <label htmlFor="IsDefault">IsDefault</label>
+                      <input
+                        type="text"
+                        id="IsDefault"
+                        value={this.state.IsDefault}  
+                        onChange={(e) => this.setIsDefault(e)}
+                      />{" "} */}
+                      <label htmlFor="link">URL</label>
+                      <input
+                        type="text"
+                        id="link"
+                        value={this.state.extLink}
+                        onChange={(e) => this.setExtLink(e)}
+                      />{" "}
+                      {/* <label htmlFor="CanDelete">IsDefault</label>
+                      <input
+                        type="text"
+                        id="CanDelete"
+                        value={this.state.CanDelete}  
+                        onChange={(e) => this.setInput(e)}
+                      />{" "} */}
+                      <button onClick={this.handleCloseModal}>CANCEL</button>{" "}
+                      <button onClick={() => this.addNewMenu()}> SAVE </button>{" "}
                     </div>
                   </ReactModal>
                 </div>
@@ -336,7 +475,6 @@ export default class CustomNavigation extends React.Component<
                   </button>{" "}
                   <br />
                 </div> */}
-
               </div>
             </div>
           </StackItem>
